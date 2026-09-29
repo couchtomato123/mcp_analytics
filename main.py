@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 import json
 from typing import Optional
 from fastmcp import FastMCP
-from fastmcp.server.auth import StaticTokenVerifier
 from google.ads.googleads.client import GoogleAdsClient
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.adaccount import AdAccount
@@ -13,19 +12,14 @@ from facebook_business.adobjects.campaign import Campaign
 from facebook_business.adobjects.adsinsights import AdsInsights
 from datetime import datetime, timedelta
 from typing import Tuple, Optional
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 load_dotenv()  # Load environment variables from .env file
 
 # 1. Fetch your secret API key from Railway environment variables
 api_key = os.environ.get("MCP_API_KEY")
-
-if api_key:
-    # 2. Configure the verifier (requires the exact token match to connect)
-    auth = StaticTokenVerifier(tokens={api_key: {"sub": "admin_user"}})
-    mcp = FastMCP("Analytics-MCP", auth=auth)
-else:
-    # Unsecured fallback for local testing
-    mcp = FastMCP("Analytics-MCP")
 
 # Add your tools below as normal...
 @mcp.tool
@@ -43,7 +37,7 @@ logging.basicConfig(
 
 # Initialize the server
 
-#mcp = FastMCP('Analytics-MCP')
+mcp = FastMCP('MCP Analytics Server')
 
 def get_date_range(days: int) -> Tuple[Optional[str], Optional[str]]:
     """Generates start_date and end_date in YYYY-MM-DD format.
@@ -422,6 +416,29 @@ def compare_ad_performance(days: int = 30) -> str:
         return f"Comparison Error: {str(e)}"
     
 #--------------------------------RUN THE SERVER------------------------------------------#
+# 2. Define the Authentication Middleware
+class BearerAuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Retrieve the expected API key from Railway environment variables
+        expected_key = os.environ.get("MCP_API_KEY")
+        
+        # If an API key is configured on the server, enforce verification
+        if expected_key:
+            auth_header = request.headers.get("Authorization")
+            expected_header_value = f"Bearer {expected_key}"
+            
+            if not auth_header or auth_header != expected_header_value:
+                return JSONResponse(
+                    status_code=401,
+                    content={"error": "Unauthorized: Invalid or missing Bearer token"}
+                )
+                
+        # Proceed with the request if auth passes (or if no key is set)
+        response = await call_next(request)
+        return response
+
+# 3. Attach the middleware to FastMCP's underlying Starlette app
+mcp.app.add_middleware(BearerAuthMiddleware)
 if __name__ == "__main__":
     # Binds the server to 0.0.0.0 so Docker can expose it, and forces SSE transport
     #mcp.run(transport="sse", host="0.0.0.0", port=80)
