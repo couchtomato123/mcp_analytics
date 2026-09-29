@@ -21,10 +21,6 @@ load_dotenv()  # Load environment variables from .env file
 # 1. Fetch your secret API key from Railway environment variables
 api_key = os.environ.get("MCP_API_KEY")
 
-# Add your tools below as normal...
-@mcp.tool
-def my_tool():
-    pass
 
 #logging.basicConfig(level=logging.INFO)
 # Ensure all logs go to stderr, NOT stdout
