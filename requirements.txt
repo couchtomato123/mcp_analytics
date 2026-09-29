@@ -1,0 +1,5 @@
+fastmcp>=4.0.0
+google-ads>=25.0.0
+uvicorn>=0.30.0
+python-dotenv>=1.0.0
+facebook_business>=21.0.0
