@@ -22,10 +22,10 @@ api_key = os.environ.get("MCP_API_KEY")
 if api_key:
     # 2. Configure the verifier (requires the exact token match to connect)
     auth = StaticTokenVerifier(tokens={api_key: {"sub": "admin_user"}})
-    mcp = FastMCP("My Server", auth=auth)
+    mcp = FastMCP("Analytics-MCP", auth=auth)
 else:
     # Unsecured fallback for local testing
-    mcp = FastMCP("My Server")
+    mcp = FastMCP("Analytics-MCP")
 
 # Add your tools below as normal...
 @mcp.tool
@@ -43,7 +43,7 @@ logging.basicConfig(
 
 # Initialize the server
 
-mcp = FastMCP('Analytics-MCP')
+#mcp = FastMCP('Analytics-MCP')
 
 def get_date_range(days: int) -> Tuple[Optional[str], Optional[str]]:
     """Generates start_date and end_date in YYYY-MM-DD format.

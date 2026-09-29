@@ -1,0 +1,11 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.git/
+.env
+.vscode/
+client_secret.json
+auth.py
+secrets-access.json
+task-definition.json
