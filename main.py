@@ -89,7 +89,6 @@ def get_google_ads_status() -> str:
     except Exception as e:
         return f"Google Ads Connection Error: {str(e)}"
 
-@mcp.tool()
 def fetch_google_ads_summary(client, customer_id: str, start_date: Optional[str], end_date: Optional[str]) -> dict:
     ga_service = client.get_service("GoogleAdsService")
     
@@ -226,7 +225,6 @@ def get_meta_ads_status(ad_account_id: str = None) -> str:
     except Exception as e:
         return f"Meta Ads API Error: {str(e)}"
 
-@mcp.tool()
 def fetch_meta_ads_summary(account, start_date: Optional[str], end_date: Optional[str]) -> dict:
     fields = [
         AdsInsights.Field.impressions,
