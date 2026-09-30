@@ -1,4 +1,5 @@
 import os
+import hmac
 import logging
 import sys
 from dotenv import load_dotenv  
@@ -12,6 +13,7 @@ from facebook_business.adobjects.campaign import Campaign
 from facebook_business.adobjects.adsinsights import AdsInsights
 from datetime import datetime, timedelta
 from typing import Tuple, Optional
+from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -414,27 +416,34 @@ def compare_ad_performance(days: int = 30) -> str:
 #--------------------------------RUN THE SERVER------------------------------------------#
 # 2. Define the Authentication Middleware
 class BearerAuthMiddleware(BaseHTTPMiddleware):
+    """Rejects any HTTP request that does not carry `Authorization: Bearer <MCP_API_KEY>`."""
+
     async def dispatch(self, request: Request, call_next):
         # Retrieve the expected API key from Railway environment variables
         expected_key = os.environ.get("MCP_API_KEY")
-        
-        # If an API key is configured on the server, enforce verification
-        if expected_key:
-            auth_header = request.headers.get("Authorization")
-            expected_header_value = f"Bearer {expected_key}"
-            
-            if not auth_header or auth_header != expected_header_value:
-                return JSONResponse(
-                    status_code=401,
-                    content={"error": "Unauthorized: Invalid or missing Bearer token"}
-                )
-                
-        # Proceed with the request if auth passes (or if no key is set)
-        response = await call_next(request)
-        return response
 
-# 3. Attach the middleware to FastMCP's underlying Starlette app
-mcp.app.add_middleware(BearerAuthMiddleware)
+        # Fail closed: without a configured key, no request is allowed through
+        if not expected_key:
+            logging.error("MCP_API_KEY is not set; rejecting request")
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Server misconfigured: MCP_API_KEY is not set"}
+            )
+
+        auth_header = request.headers.get("Authorization", "")
+        scheme, _, token = auth_header.partition(" ")
+
+        # Constant-time comparison to avoid leaking the key via timing
+        if scheme.lower() != "bearer" or not hmac.compare_digest(token.strip(), expected_key):
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Unauthorized: Invalid or missing Bearer token"},
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+
+        # Proceed with the request if auth passes
+        return await call_next(request)
+
 if __name__ == "__main__":
     # Binds the server to 0.0.0.0 so Docker can expose it, and forces SSE transport
     #mcp.run(transport="sse", host="0.0.0.0", port=80)
@@ -444,4 +453,12 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
     
     # Host MUST be 0.0.0.0 to accept external traffic in the cloud
-    mcp.run(transport="http", host="0.0.0.0", port=port, path="/mcp")
+    # 3. Attach the middleware to FastMCP's underlying Starlette app.
+    # FastMCP has no `.app` attribute; middleware is passed when the HTTP app is built.
+    mcp.run(
+        transport="http",
+        host="0.0.0.0",
+        port=port,
+        path="/mcp",
+        middleware=[Middleware(BearerAuthMiddleware)],
+    )
