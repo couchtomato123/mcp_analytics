@@ -387,7 +387,7 @@ def get_ga4_credentials() -> Credentials:
     """
     return Credentials(
         token=None,
-        refresh_token=os.getenv("GA4_REFRESH_TOKEN") or os.getenv("GOOGLE_ADS_REFRESH_TOKEN"),,
+        refresh_token=os.getenv("GA4_REFRESH_TOKEN") or os.getenv("GOOGLE_ADS_REFRESH_TOKEN"),
         client_id=os.getenv("GA4_CLIENT_ID") or os.getenv("GOOGLE_ADS_CLIENT_ID"),
         client_secret=os.getenv("GA4_CLIENT_SECRET") or os.getenv("GOOGLE_ADS_CLIENT_SECRET"),
         token_uri="https://oauth2.googleapis.com/token",
