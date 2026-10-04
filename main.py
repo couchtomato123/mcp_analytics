@@ -11,6 +11,16 @@ from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.campaign import Campaign
 from facebook_business.adobjects.adsinsights import AdsInsights
+from google.oauth2.credentials import Credentials
+from google.analytics.data_v1beta import BetaAnalyticsDataClient
+from google.analytics.data_v1beta.types import (
+    DateRange,
+    Dimension,
+    Metric,
+    OrderBy,
+    RunReportRequest,
+)
+from google.analytics.admin_v1beta import AnalyticsAdminServiceClient
 from datetime import datetime, timedelta
 from typing import Tuple, Optional
 from starlette.middleware import Middleware
@@ -362,6 +372,146 @@ def get_meta_campaign_report(
     except Exception as e:
         return f"Meta Ads Reporting Error: {str(e)}"
 
+
+#--------------------------------GOOGLE ANALYTICS (GA4)------------------------------------------#
+GA4_SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
+# Earliest start date the GA4 Data API accepts; used for 'all-time' reports
+GA4_EARLIEST_DATE = "2015-08-14"
+
+def get_ga4_credentials() -> Credentials:
+    """Builds OAuth user credentials for GA4 from environment variables.
+
+    Falls back to the Google Ads OAuth client when GA4-specific values are not set,
+    so one OAuth client can serve both APIs (the refresh token must still have been
+    issued with the analytics.readonly scope).
+    """
+    return Credentials(
+        token=None,
+        refresh_token=os.getenv("GA4_REFRESH_TOKEN"),
+        client_id=os.getenv("GA4_CLIENT_ID") or os.getenv("GOOGLE_ADS_CLIENT_ID"),
+        client_secret=os.getenv("GA4_CLIENT_SECRET") or os.getenv("GOOGLE_ADS_CLIENT_SECRET"),
+        token_uri="https://oauth2.googleapis.com/token",
+        scopes=GA4_SCOPES,
+    )
+
+def get_ga4_property(property_id: Optional[str] = None) -> str:
+    """Returns the property resource name ('properties/123456789') from the argument or GA4_PROPERTY_ID."""
+    target_id = (property_id or os.getenv("GA4_PROPERTY_ID") or "").strip()
+    if not target_id:
+        raise ValueError("No GA4 property ID provided and GA4_PROPERTY_ID is not set.")
+    target_id = target_id.removeprefix("properties/")
+    return f"properties/{target_id}"
+
+def fetch_ga4_accounts() -> list:
+    """Lists every GA4 account and property the credentials can read."""
+    admin_client = AnalyticsAdminServiceClient(credentials=get_ga4_credentials())
+
+    accounts = []
+    for summary in admin_client.list_account_summaries():
+        accounts.append({
+            "account": summary.account,
+            "account_name": summary.display_name,
+            "properties": [
+                {"property_id": p.property.removeprefix("properties/"), "property_name": p.display_name}
+                for p in summary.property_summaries
+            ],
+        })
+    return accounts
+
+@mcp.tool()
+def get_ga4_status() -> str:
+    """Checks the Google Analytics (GA4) connection and lists the accounts and
+    properties (with their property IDs) that the credentials can access."""
+    try:
+        accounts = fetch_ga4_accounts()
+        if not accounts:
+            return "Connected to Google Analytics, but no GA4 accounts/properties are accessible."
+        return json.dumps({
+            "status": "connected",
+            "default_property_id": os.getenv("GA4_PROPERTY_ID"),
+            "accounts": accounts,
+        }, indent=2)
+    except Exception as e:
+        return f"Google Analytics Connection Error: {str(e)}"
+
+@mcp.tool()
+def get_ga4_report(
+    days: int = 30,
+    metrics: str = "sessions,totalUsers,newUsers,engagementRate,conversions,totalRevenue",
+    dimensions: str = "",
+    property_id: Optional[str] = None,
+    limit: int = 50,
+) -> str:
+    """Runs a Google Analytics 4 report (GA4 Data API runReport).
+
+    Args:
+        days: Number of past days to analyze (e.g., 7, 30, 90), ending yesterday.
+              Pass 0 for 'overall' / 'all-time'.
+        metrics: Comma-separated GA4 metric API names, e.g. 'sessions,totalUsers,
+                 screenPageViews,engagementRate,averageSessionDuration,conversions,
+                 totalRevenue,purchaseRevenue,transactions'. Max 10.
+        dimensions: Comma-separated GA4 dimension API names, e.g. 'date',
+                    'sessionDefaultChannelGroup', 'sessionSourceMedium', 'sessionCampaignName',
+                    'country', 'deviceCategory', 'landingPage', 'pagePath', 'eventName'.
+                    Leave empty for property-wide totals. Max 9.
+        property_id: Numeric GA4 property ID (not the 'G-' measurement ID).
+                     Defaults to GA4_PROPERTY_ID env var if omitted.
+        limit: Maximum number of rows to return (default 50).
+    """
+    try:
+        property_name = get_ga4_property(property_id)
+        metric_names = [m.strip() for m in metrics.split(",") if m.strip()]
+        dimension_names = [d.strip() for d in dimensions.split(",") if d.strip()]
+        if not metric_names:
+            return "Error: At least one metric is required."
+
+        start_date, end_date = get_date_range(days)
+        if not start_date:
+            start_date, end_date = GA4_EARLIEST_DATE, "yesterday"
+        timeframe_label = f"Last {days} days ({start_date} to {end_date})" if days > 0 else "Overall / All-Time"
+
+        # Sort by date ascending for time series, otherwise by the first metric descending
+        if "date" in dimension_names:
+            order_bys = [OrderBy(dimension=OrderBy.DimensionOrderBy(dimension_name="date"))]
+        else:
+            order_bys = [OrderBy(metric=OrderBy.MetricOrderBy(metric_name=metric_names[0]), desc=True)]
+
+        client = BetaAnalyticsDataClient(credentials=get_ga4_credentials())
+        request = RunReportRequest(
+            property=property_name,
+            date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+            dimensions=[Dimension(name=d) for d in dimension_names],
+            metrics=[Metric(name=m) for m in metric_names],
+            order_bys=order_bys,
+            limit=limit,
+        )
+        response = client.run_report(request)
+
+        rows = []
+        for row in response.rows:
+            record = {}
+            for header, value in zip(response.dimension_headers, row.dimension_values):
+                record[header.name] = value.value
+            for header, value in zip(response.metric_headers, row.metric_values):
+                try:
+                    number = float(value.value)
+                    record[header.name] = int(number) if number.is_integer() else round(number, 4)
+                except ValueError:
+                    record[header.name] = value.value
+            rows.append(record)
+
+        if not rows:
+            return f"No Google Analytics data found for {property_name} in the selected timeframe ({timeframe_label})."
+
+        return json.dumps({
+            "property": property_name,
+            "timeframe": timeframe_label,
+            "total_rows": response.row_count,
+            "rows": rows,
+        }, indent=2)
+
+    except Exception as e:
+        return f"Google Analytics Reporting Error: {str(e)}"
 
 #--------------------------------COMPARISON------------------------------------------#
 

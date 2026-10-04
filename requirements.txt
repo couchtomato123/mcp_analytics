@@ -3,3 +3,5 @@ google-ads>=25.0.0
 uvicorn>=0.30.0
 python-dotenv>=1.0.0
 facebook_business>=21.0.0
+google-analytics-data>=0.18.0
+google-analytics-admin>=0.23.0
