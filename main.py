@@ -50,7 +50,7 @@ mcp = FastMCP('MCP Analytics Server')
 def get_date_range(days: int) -> Tuple[Optional[str], Optional[str]]:
     """Generates start_date and end_date in YYYY-MM-DD format.
     
-    If days == 0, returns (None, None) representing 'ALL_TIME' / 'maximum'.
+    If days == 0,returns (None, None) representing 'ALL_TIME' / 'maximum'.
     """
     if days <= 0:
         return None, None
