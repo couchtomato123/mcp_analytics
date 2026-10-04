@@ -381,9 +381,9 @@ GA4_EARLIEST_DATE = "2015-08-14"
 def get_ga4_credentials() -> Credentials:
     """Builds OAuth user credentials for GA4 from environment variables.
 
-    Falls back to the Google Ads OAuth client when GA4-specific values are not set,
-    so one OAuth client can serve both APIs (the refresh token must still have been
-    issued with the analytics.readonly scope).
+    Falls back to the Google Ads OAuth values when GA4-specific ones are not set, so a
+    single refresh token issued with both the adwords and analytics.readonly scopes
+    can serve both APIs.
     """
     return Credentials(
         token=None,
