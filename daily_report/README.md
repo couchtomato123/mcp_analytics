@@ -41,12 +41,16 @@ and creates a Cloud Scheduler trigger (`0 7 * * 1-5`, `America/Los_Angeles`).
 
 ## Credentials
 
+Secrets never go in the repo. In production they live in Google Cloud Secret Manager and the
+job reads them at run time. For a local test run, `python -m daily_report` also reads a `.env`
+file on your own machine, which `.gitignore` keeps out of git.
+
 | Variable | Where it comes from |
 |---|---|
 | `SF_DOMAIN_URL`, `SF_CLIENT_ID`, `SF_CLIENT_SECRET` | Salesforce External Client App with **Client Credentials Flow** enabled and a read-only integration user set as "Run As" (see below) |
 | `GA4_PROPERTY_ID` | GA4 property ID. Auth reuses `GOOGLE_ADS_REFRESH_TOKEN` (same as `main.py`), or the job's service account if no refresh token is set; add that service account as a Viewer on the property |
 | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN`, `GOOGLE_ADS_DEVELOPER_TOKEN` (optional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for an MCC) | Same values the MCP server already uses |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Any SMTP relay. For Google Workspace: `smtp.gmail.com:587` with an app password for the sending mailbox. SendGrid (`smtp.sendgrid.net`, user `apikey`) and Amazon SES SMTP also work |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Any SMTP service. Easiest without Google Workspace: Resend (`smtp.resend.com:587`, user `resend`, password = API key) or Brevo (`smtp-relay.brevo.com:587`, SMTP login + SMTP key); both have free tiers far above 22 emails a month and need SPF/DKIM DNS records added for barrister-suites.com. Microsoft 365 (`smtp.office365.com:587`) and Amazon SES SMTP also work |
 | `REPORT_RECIPIENTS` | Comma-separated. Defaults to `leasing@barrister-suites.com` |
 
 The Salesforce *SObject Read* connector in Claude is tied to an interactive
