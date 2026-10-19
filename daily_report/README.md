@@ -61,14 +61,20 @@ same `/services/oauth2/token` client-credentials call, so no code changes.
 
 1. In Setup, open **External Client App Manager → New External Client App**.
    Set Distribution State to **Local**.
-2. Under **API (Enable OAuth Settings)**, tick **Enable OAuth**, add the scope
-   **Manage user data via APIs (`api`)**, and tick **Enable Client
-   Credentials Flow**. A callback URL is required but unused; any HTTPS URL
-   works.
-3. After saving, open the app's **Policies** tab, then **Edit → OAuth
-   Policies**. Tick **Enable Client Credentials Flow** and set **Run As** to
-   a dedicated integration user (the free "Salesforce Integration" license
-   works) with read-only access to Lead, Opportunity, Event and Property__c.
+2. Under **API (Enable OAuth Settings)**, tick **Enable OAuth** and add the
+   scope **Manage user data via APIs (`api`)**. A callback URL is required but
+   unused; any HTTPS URL works. Then, further down under **Flow
+   Enablement**, tick **Enable Client Credentials Flow** and confirm the
+   dialog. This must be done before step 3, or the Policies checkbox stays
+   greyed out. On an existing app, it's under **Settings → Edit → OAuth
+   Settings → Flow Enablement**.
+3. Open the app's **Policies** tab and click **Edit**. Under **OAuth
+   Policies → OAuth Flows and External Client App Enhancements**, tick
+   **Enable Client Credentials Flow** and set **Run As** to a dedicated
+   integration user (the free "Salesforce Integration" license works) with
+   read-only access to Lead, Opportunity, Event and Property__c. If the
+   checkbox is still greyed out, your admin profile lacks the
+   External Client App edit-policies permission.
 4. On the **Settings** tab, open **OAuth Settings → Consumer Key and Secret**
    and copy them into `SF_CLIENT_ID` and `SF_CLIENT_SECRET`.
 5. Set `SF_DOMAIN_URL` to the org's My Domain URL. The client-credentials
