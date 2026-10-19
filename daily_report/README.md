@@ -43,7 +43,7 @@ and creates a Cloud Scheduler trigger (`0 7 * * 1-5`, `America/Los_Angeles`).
 
 | Variable | Where it comes from |
 |---|---|
-| `SF_DOMAIN_URL`, `SF_CLIENT_ID`, `SF_CLIENT_SECRET` | Salesforce Connected App with **Client Credentials Flow** enabled and a read-only integration user set as "Run As" |
+| `SF_DOMAIN_URL`, `SF_CLIENT_ID`, `SF_CLIENT_SECRET` | Salesforce External Client App with **Client Credentials Flow** enabled and a read-only integration user set as "Run As" (see below) |
 | `GA4_PROPERTY_ID` | GA4 property ID. Auth reuses `GOOGLE_ADS_REFRESH_TOKEN` (same as `main.py`), or the job's service account if no refresh token is set; add that service account as a Viewer on the property |
 | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN`, `GOOGLE_ADS_DEVELOPER_TOKEN` (optional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for an MCC) | Same values the MCP server already uses |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Any SMTP relay. For Google Workspace: `smtp.gmail.com:587` with an app password for the sending mailbox. SendGrid (`smtp.sendgrid.net`, user `apikey`) and Amazon SES SMTP also work |
@@ -51,15 +51,28 @@ and creates a Cloud Scheduler trigger (`0 7 * * 1-5`, `America/Los_Angeles`).
 
 The Salesforce *SObject Read* connector in Claude is tied to an interactive
 user session, so it can't drive an unattended job. It was used to verify every
-query here against live data. The job needs its own Connected App (spec §7).
+query here against live data. The job needs its own External Client App (spec §7 says Connected App, which Salesforce no longer allows creating).
 
-### Salesforce Connected App setup
+### Salesforce External Client App setup
 
-1. In Setup, open **App Manager → New Connected App**.
-2. Enable OAuth with scope `api`, and tick **Enable Client Credentials Flow**.
-3. Open **Manage → Edit Policies**, set **Run As** to a dedicated integration
-   user with read access to Lead, Opportunity, Event and Property__c.
-4. Copy the consumer key and secret into `SF_CLIENT_ID` and `SF_CLIENT_SECRET`.
+Since Spring '26, Salesforce no longer lets orgs create new Connected Apps
+without a Support case. Use an **External Client App** instead. It uses the
+same `/services/oauth2/token` client-credentials call, so no code changes.
+
+1. In Setup, open **External Client App Manager → New External Client App**.
+   Set Distribution State to **Local**.
+2. Under **API (Enable OAuth Settings)**, tick **Enable OAuth**, add the scope
+   **Manage user data via APIs (`api`)**, and tick **Enable Client
+   Credentials Flow**. A callback URL is required but unused; any HTTPS URL
+   works.
+3. After saving, open the app's **Policies** tab, then **Edit → OAuth
+   Policies**. Tick **Enable Client Credentials Flow** and set **Run As** to
+   a dedicated integration user (the free "Salesforce Integration" license
+   works) with read-only access to Lead, Opportunity, Event and Property__c.
+4. On the **Settings** tab, open **OAuth Settings → Consumer Key and Secret**
+   and copy them into `SF_CLIENT_ID` and `SF_CLIENT_SECRET`.
+5. Set `SF_DOMAIN_URL` to the org's My Domain URL. The client-credentials
+   flow rejects `login.salesforce.com`.
 
 ## Where this differs from the spec (verified against live data, Oct 2026)
 

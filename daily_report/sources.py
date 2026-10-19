@@ -19,8 +19,9 @@ LATE_STAGES = ("Negotiation", "LOS")
 
 # ------------------------------- Salesforce ------------------------------- #
 class SalesforceClient:
-    """Minimal REST client using the OAuth 2.0 client-credentials flow, which
-    runs as the Connected App's configured integration user (no interactive
+    """Minimal REST client using the OAuth 2.0 client-credentials flow of an
+    External Client App (or legacy Connected App), which
+    runs as the app's configured integration user (no interactive
     login, suitable for an unattended job)."""
 
     def __init__(self):
