@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from .kpis import build_report
 from .mailer import send_email
-from .periods import build_period, today_local
+from .periods import build_period, local_hour, today_local
 from .render import render_html, render_text, subject
 from .sources import fetch_all
 
@@ -33,6 +33,14 @@ def main(argv=None) -> int:
     parser.add_argument("--raw-in", help="Render from a saved --raw-out file instead of calling the APIs")
     parser.add_argument("--run-date", type=date.fromisoformat, help=argparse.SUPPRESS)  # testing: pretend today is this
     args = parser.parse_args(argv)
+
+    # Railway cron is UTC-only, so it fires at both 14:00 and 15:00 UTC and
+    # this guard keeps only the run that lands at 7 AM Pacific (PDT or PST).
+    send_hour = os.getenv("REPORT_SEND_HOUR")
+    scheduled = not (args.date or args.dry_run or args.raw_in or args.run_date)
+    if scheduled and send_hour and local_hour() != int(send_hour):
+        logging.info("Not %s:00 in Los Angeles yet/anymore; skipping this run", send_hour)
+        return 0
 
     period = build_period(args.run_date or today_local(), args.date)
     if args.raw_in:

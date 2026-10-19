@@ -23,21 +23,27 @@ Each run prints one JSON line (`"event": "daily_report_run"`) with the status,
 row counts per source and any source errors. In Cloud Run this lands in Cloud
 Logging, which gives the audit log required by spec §9.
 
-## Scheduler: Cloud Run Job + Cloud Scheduler
+## Scheduler: Railway cron (same project as the MCP server)
 
-`deploy/daily_report.sh` builds this repo's Dockerfile into a Cloud Run Job
-and creates a Cloud Scheduler trigger (`0 7 * * 1-5`, `America/Los_Angeles`).
+1. In the Railway project, choose **New → GitHub Repo**, pick this repo again,
+   and name the service `daily-report`.
+2. In the service's **Settings → Config-as-code**, set the path to
+   `deploy/railway.daily_report.json`. That sets:
+   - the start command to `python -m daily_report`
+   - the cron schedule to `0 14,15 * * 1-5`
+   - restarts to never
+3. Under **Variables**, add the variables from the table below, plus
+   `REPORT_SEND_HOUR=7`. You can copy the Google Ads and GA4 ones from the
+   MCP service with reference variables such as
+   `${{mcp-server.GOOGLE_ADS_CLIENT_ID}}`.
 
-- **Why this setup:** Scheduler has a retry-backed SLA and native time-zone and
-  DST support. GitHub Actions cron is UTC-only and often runs 10–60 minutes
-  late. Railway cron is UTC-only too.
-- **Cost:** essentially free.
-  - Cloud Scheduler: first 3 jobs per billing account are free.
-  - Cloud Run Jobs: about 22 one-minute runs a month, inside the free tier.
-  - Secret Manager: about $0.40 a month for 7 secrets.
-- **Retries:** the job exits non-zero only when the email fails to send, and
-  then retries once. A run with one source down still sends, with that
-  section marked "Data unavailable", and is never re-sent.
+Railway cron only runs on UTC, so the job fires at both 14:00 and 15:00 UTC.
+With `REPORT_SEND_HOUR=7` it exits straight away unless it's 7 AM in Los
+Angeles, so exactly one email goes out year-round, through daylight-saving
+changes. A run that fails to send exits non-zero and shows as failed in
+Railway's deployment log. It is not retried, so nothing is ever sent twice.
+
+`deploy/daily_report.sh` is an alternative setup on Google Cloud (Cloud Run Job + Cloud Scheduler).
 
 ## Credentials
 
@@ -50,7 +56,7 @@ file on your own machine, which `.gitignore` keeps out of git.
 | `SF_DOMAIN_URL`, `SF_CLIENT_ID`, `SF_CLIENT_SECRET` | Salesforce External Client App with **Client Credentials Flow** enabled and a read-only integration user set as "Run As" (see below) |
 | `GA4_PROPERTY_ID` | GA4 property ID. Auth reuses `GOOGLE_ADS_REFRESH_TOKEN` (same as `main.py`), or the job's service account if no refresh token is set; add that service account as a Viewer on the property |
 | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN`, `GOOGLE_ADS_DEVELOPER_TOKEN` (optional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for an MCC) | Same values the MCP server already uses |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Any SMTP service. Easiest without Google Workspace: Resend (`smtp.resend.com:587`, user `resend`, password = API key) or Brevo (`smtp-relay.brevo.com:587`, SMTP login + SMTP key); both have free tiers far above 22 emails a month and need SPF/DKIM DNS records added for barrister-suites.com. Microsoft 365 (`smtp.office365.com:587`) and Amazon SES SMTP also work |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Outlook / Microsoft 365: `smtp.office365.com`, `587`, the sending mailbox's full address and password; `REPORT_FROM` must be that same address. The mailbox needs **Authenticated SMTP** enabled (Microsoft 365 admin center → Users → the user → Mail → Manage email apps). Microsoft plans to turn basic-auth SMTP off by default at the end of December 2026 (admins can re-enable it); if that bites, switch to Resend (`smtp.resend.com`, user `resend`, API key) or Brevo (`smtp-relay.brevo.com`). No code change either way |
 | `REPORT_RECIPIENTS` | Comma-separated. Defaults to `leasing@barrister-suites.com` |
 
 The Salesforce *SObject Read* connector in Claude is tied to an interactive
