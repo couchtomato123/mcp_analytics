@@ -1,5 +1,6 @@
-"""Sends the brief over SMTP: works with Google Workspace, SendGrid, Amazon SES
-and Microsoft 365, so no vendor SDK is needed."""
+"""Sends the brief over SMTP: works with Gmail, Microsoft 365, Resend, Brevo,
+SendGrid and Amazon SES, so no vendor SDK is needed."""
+import logging
 import os
 import smtplib
 from email.message import EmailMessage
@@ -22,12 +23,15 @@ def send_email(subject: str, html: str, text: str, recipients: list[str]) -> Non
     msg.set_content(text)
     msg.add_alternative(html, subtype="html")
 
+    log = logging.getLogger(__name__)
+    log.info("Connecting to %s:%s...", host, port)
     if port == 465:
-        server = smtplib.SMTP_SSL(host, port, timeout=60)
+        server = smtplib.SMTP_SSL(host, port, timeout=30)
     else:
-        server = smtplib.SMTP(host, port, timeout=60)
+        server = smtplib.SMTP(host, port, timeout=30)
         server.starttls()
     with server:
         if username:
             server.login(username, password)
         server.send_message(msg)
+    log.info("Email sent to %s", ", ".join(recipients))

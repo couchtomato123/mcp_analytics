@@ -201,5 +201,16 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(raw, before)
 
 
+class ScheduleGuardTests(unittest.TestCase):
+    def test_skips_the_utc_run_that_is_not_7am_pacific(self):
+        from unittest import mock
+        from daily_report import __main__ as cli
+        with mock.patch.dict("os.environ", {"REPORT_SEND_HOUR": "7"}), \
+                mock.patch.object(cli, "local_hour", return_value=8), \
+                mock.patch.object(cli, "fetch_all") as fetch:
+            self.assertEqual(cli.main([]), 0)
+            fetch.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -46,6 +46,10 @@ def today_local() -> date:
     return datetime.now(REPORT_TZ).date()
 
 
+def local_hour() -> int:
+    return datetime.now(REPORT_TZ).hour
+
+
 def build_period(run_date: date, report_date: date | None = None) -> Period:
     """A Monday run covers Fri, Sat and Sun so nothing from the weekend is
     skipped; any other run covers the previous day. An explicit report_date
