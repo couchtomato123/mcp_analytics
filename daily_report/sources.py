@@ -6,6 +6,7 @@ kpis.py, not here.
 """
 import logging
 import os
+import time
 
 import requests
 
@@ -13,6 +14,9 @@ from .periods import Period, local_day_bounds_utc, utc_timestamp_to_local_date
 
 log = logging.getLogger(__name__)
 
+# Per-call cap for Google API requests; their library defaults allow retries for
+# up to an hour, which looks like a silent hang in Railway's logs.
+GOOGLE_API_TIMEOUT = 60
 SF_API_VERSION = os.getenv("SF_API_VERSION", "v61.0")
 LATE_STAGES = ("Negotiation", "LOS")
 
@@ -187,7 +191,7 @@ def fetch_ga4(period: Period) -> dict:
             order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name=order_metric), desc=True)] if order_metric else [],
             limit=limit,
         )
-        return _ga4_rows(client.run_report(request))
+        return _ga4_rows(client.run_report(request, timeout=GOOGLE_API_TIMEOUT))
 
     daily = run(window, ["date"], totals)
     for row in daily:  # GA4 returns YYYYMMDD
@@ -231,7 +235,7 @@ def fetch_google_ads(period: Period) -> dict:
             "impressions": row.metrics.impressions,
             "conversions": row.metrics.conversions,
         }
-        for row in service.search(customer_id=customer_id, query=daily_query)
+        for row in service.search(customer_id=customer_id, query=daily_query, timeout=GOOGLE_API_TIMEOUT)
     ]
 
     campaign_query = (
@@ -246,7 +250,7 @@ def fetch_google_ads(period: Period) -> dict:
             "clicks": row.metrics.clicks,
             "conversions": row.metrics.conversions,
         }
-        for row in service.search(customer_id=customer_id, query=campaign_query)
+        for row in service.search(customer_id=customer_id, query=campaign_query, timeout=GOOGLE_API_TIMEOUT)
     ]
     return {"daily": daily, "campaigns": campaigns}
 
@@ -264,8 +268,11 @@ def fetch_all(period: Period) -> dict:
     sections render as 'Data unavailable' rather than zeros."""
     raw = {"errors": {}}
     for name, fetch in FETCHERS.items():
+        log.info("Fetching %s...", name)
+        started = time.monotonic()
         try:
             raw[name] = fetch(period)
+            log.info("Fetched %s in %.1fs", name, time.monotonic() - started)
         except Exception as exc:  # noqa: BLE001 - any failure must degrade to "Data unavailable"
             log.exception("Fetching %s failed", name)
             raw["errors"][name] = f"{type(exc).__name__}: {exc}"

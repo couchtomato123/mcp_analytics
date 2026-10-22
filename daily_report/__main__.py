@@ -1,5 +1,6 @@
 """Entry point: python -m daily_report [--date YYYY-MM-DD] [--dry-run] ..."""
 import argparse
+import faulthandler
 import json
 import logging
 import os
@@ -34,15 +35,22 @@ def main(argv=None) -> int:
     parser.add_argument("--run-date", type=date.fromisoformat, help=argparse.SUPPRESS)  # testing: pretend today is this
     args = parser.parse_args(argv)
 
+    # If anything hangs (network calls block in C, beyond Python's reach),
+    # print every thread's stack to the log and exit non-zero instead of
+    # sitting silently until Railway kills the container.
+    faulthandler.dump_traceback_later(int(os.getenv("REPORT_TIMEOUT_SECONDS", "300")), exit=True)
+
     # Railway cron is UTC-only, so it fires at both 14:00 and 15:00 UTC and
     # this guard keeps only the run that lands at 7 AM Pacific (PDT or PST).
     send_hour = os.getenv("REPORT_SEND_HOUR")
     scheduled = not (args.date or args.dry_run or args.raw_in or args.run_date)
     if scheduled and send_hour and local_hour() != int(send_hour):
         logging.info("Not %s:00 in Los Angeles yet/anymore; skipping this run", send_hour)
+        faulthandler.cancel_dump_traceback_later()
         return 0
 
     period = build_period(args.run_date or today_local(), args.date)
+    logging.info("Building report for %s", ", ".join(d.isoformat() for d in period.days))
     if args.raw_in:
         with open(args.raw_in) as f:
             raw = json.load(f)
@@ -90,6 +98,7 @@ def main(argv=None) -> int:
     }))
     # Only a failed send fails the job, so a retry never double-sends a report
     # that went out with one source marked unavailable.
+    faulthandler.cancel_dump_traceback_later()
     return 1 if send_error else 0
 
 

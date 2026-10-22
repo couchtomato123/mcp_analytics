@@ -27,11 +27,11 @@ Logging, which gives the audit log required by spec §9.
 
 1. In the Railway project, choose **New → GitHub Repo**, pick this repo again,
    and name the service `daily-report`.
-2. In the service's **Settings → Config-as-code**, set the path to
-   `deploy/railway.daily_report.json`. That sets:
-   - the start command to `python -m daily_report`
-   - the cron schedule to `0 14,15 * * 1-5`
-   - restarts to never
+2. In the service's **Settings**, set:
+   - **Custom Start Command** to `python -m daily_report`
+   - **Cron Schedule** to `0 14,15 * * 1-5`
+   - **Restart Policy** to **Never**
+   - no health check and no public domain
 3. Under **Variables**, add the variables from the table below, plus
    `REPORT_SEND_HOUR=7`. You can copy the Google Ads and GA4 ones from the
    MCP service with reference variables such as
@@ -42,6 +42,14 @@ With `REPORT_SEND_HOUR=7` it exits straight away unless it's 7 AM in Los
 Angeles, so exactly one email goes out year-round, through daylight-saving
 changes. A run that fails to send exits non-zero and shows as failed in
 Railway's deployment log. It is not retried, so nothing is ever sent twice.
+
+Each step logs as it runs: `Fetching salesforce...`, `Connecting to smtp.gmail.com:587...`
+and so on. If a run gets stuck for 5 minutes (`REPORT_TIMEOUT_SECONDS`), it prints where it
+was stuck and exits as failed.
+
+**Railway blocks outbound SMTP (ports 25/465/587) on its Free, Trial and Hobby plans**;
+only Pro can send mail directly. On those plans the log stops at `Connecting to ...` and
+the run times out. Either upgrade to Pro, or send through an HTTPS email API instead.
 
 `deploy/daily_report.sh` is an alternative setup on Google Cloud (Cloud Run Job + Cloud Scheduler).
 
