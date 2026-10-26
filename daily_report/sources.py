@@ -21,6 +21,17 @@ SF_API_VERSION = os.getenv("SF_API_VERSION", "v61.0")
 LATE_STAGES = ("Negotiation", "LOS")
 
 
+class MissingSetting(RuntimeError):
+    """A required environment variable is not set; logged as one line, not a traceback."""
+
+
+def require_env(name: str) -> str:
+    value = os.getenv(name, "").strip()
+    if not value:
+        raise MissingSetting(f"{name} is not set. Add it to this service's variables in Railway.")
+    return value
+
+
 # ------------------------------- Salesforce ------------------------------- #
 class SalesforceClient:
     """Minimal REST client using the OAuth 2.0 client-credentials flow of an
@@ -29,13 +40,15 @@ class SalesforceClient:
     login, suitable for an unattended job)."""
 
     def __init__(self):
-        domain = os.environ["SF_DOMAIN_URL"].rstrip("/")  # e.g. https://barrister.my.salesforce.com
+        domain = require_env("SF_DOMAIN_URL").rstrip("/")  # e.g. https://barrister.my.salesforce.com
+        if not domain.startswith(("https://", "http://")):
+            domain = f"https://{domain}"
         resp = requests.post(
             f"{domain}/services/oauth2/token",
             data={
                 "grant_type": "client_credentials",
-                "client_id": os.environ["SF_CLIENT_ID"],
-                "client_secret": os.environ["SF_CLIENT_SECRET"],
+                "client_id": require_env("SF_CLIENT_ID"),
+                "client_secret": require_env("SF_CLIENT_SECRET"),
             },
             timeout=30,
         )
@@ -171,12 +184,12 @@ def _ga4_rows(response) -> list:
 
 
 def fetch_ga4(period: Period) -> dict:
+    property_id = require_env("GA4_PROPERTY_ID").removeprefix("properties/")
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
     from google.analytics.data_v1beta.types import (
         DateRange, Dimension, Metric, OrderBy, RunReportRequest,
     )
 
-    property_id = os.environ["GA4_PROPERTY_ID"].strip().removeprefix("properties/")
     client = BetaAnalyticsDataClient(credentials=_ga4_credentials())
     window = DateRange(start_date=period.window_start.isoformat(), end_date=period.end.isoformat())
     in_period = DateRange(start_date=period.start.isoformat(), end_date=period.end.isoformat())
@@ -220,7 +233,7 @@ def _google_ads_client():
 
 
 def fetch_google_ads(period: Period) -> dict:
-    customer_id = os.environ["GOOGLE_ADS_CUSTOMER_ID"].replace("-", "").strip()
+    customer_id = require_env("GOOGLE_ADS_CUSTOMER_ID").replace("-", "")
     service = _google_ads_client().get_service("GoogleAdsService")
 
     daily_query = (
@@ -273,6 +286,9 @@ def fetch_all(period: Period) -> dict:
         try:
             raw[name] = fetch(period)
             log.info("Fetched %s in %.1fs", name, time.monotonic() - started)
+        except MissingSetting as exc:
+            log.error("Fetching %s failed: %s", name, exc)
+            raw["errors"][name] = str(exc)
         except Exception as exc:  # noqa: BLE001 - any failure must degrade to "Data unavailable"
             log.exception("Fetching %s failed", name)
             raw["errors"][name] = f"{type(exc).__name__}: {exc}"

@@ -63,7 +63,7 @@ file on your own machine, which `.gitignore` keeps out of git.
 |---|---|
 | `SF_DOMAIN_URL`, `SF_CLIENT_ID`, `SF_CLIENT_SECRET` | Salesforce External Client App with **Client Credentials Flow** enabled and a read-only integration user set as "Run As" (see below) |
 | `GA4_PROPERTY_ID` | GA4 property ID. Auth reuses `GOOGLE_ADS_REFRESH_TOKEN` (same as `main.py`), or the job's service account if no refresh token is set; add that service account as a Viewer on the property |
-| `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN`, `GOOGLE_ADS_DEVELOPER_TOKEN` (optional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for an MCC) | Same values the MCP server already uses |
+| `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN` (optional: `GOOGLE_ADS_DEVELOPER_TOKEN`, and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for a manager/MCC account) | Same values the MCP server already uses. Only set the optional ones if the MCP service has them |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Outlook / Microsoft 365: `smtp.office365.com`, `587`, the sending mailbox's full address and password; `REPORT_FROM` must be that same address. The mailbox needs **Authenticated SMTP** enabled (Microsoft 365 admin center → Users → the user → Mail → Manage email apps). Microsoft plans to turn basic-auth SMTP off by default at the end of December 2026 (admins can re-enable it); if that bites, switch to Resend (`smtp.resend.com`, user `resend`, API key) or Brevo (`smtp-relay.brevo.com`). No code change either way |
 | `REPORT_RECIPIENTS` | Comma-separated. Defaults to `leasing@barrister-suites.com` |
 

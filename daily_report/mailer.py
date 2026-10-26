@@ -6,13 +6,15 @@ import smtplib
 from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
 
+from .sources import require_env
+
 
 def send_email(subject: str, html: str, text: str, recipients: list[str]) -> None:
-    host = os.environ["SMTP_HOST"]
+    host = require_env("SMTP_HOST")
     port = int(os.getenv("SMTP_PORT", "587"))
     username = os.getenv("SMTP_USERNAME")
     password = os.getenv("SMTP_PASSWORD")
-    sender = os.environ["REPORT_FROM"]
+    sender = require_env("REPORT_FROM")
 
     msg = EmailMessage()
     msg["Subject"] = subject
