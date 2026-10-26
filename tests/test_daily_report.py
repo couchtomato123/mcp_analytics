@@ -15,7 +15,7 @@ def lead(day, status="New", source="Google Ads", lead_type="Physical Tenant", pr
 
 def won(day, rr, change="New Client", one_time=0.0, name="Deal"):
     return {"close_date": day, "name": name, "recurring_revenue": rr, "one_time_revenue": one_time,
-            "lease_change_type": change, "client_type": "Virtual Client",
+            "lease_change_type": change, "client_type": "Virtual Client", "lead_source": None,
             "property": "P08 - The Torrance"}
 
 
@@ -94,7 +94,7 @@ class FakeSalesforce:
         if "FROM Opportunity WHERE IsWon" in soql:
             return [{"CloseDate": "2026-10-15", "Name": "X", "Recurring_Revenue__c": None, "One_Time_Revenue__c": 35,
                      "Lease_Change_Type__c": "New Client", "Opportunity_Client_Type__c": "One Time User",
-                     "Property__r": {"Name": "P98 - Corporate Point Calabasas"}}]
+                     "LeadSource": "LiquidSpace", "Property__r": {"Name": "P98 - Corporate Point Calabasas"}}]
         if "FROM Event" in soql:
             return [{"ActivityDate": "2026-10-15", "Subject": "Tour"}]
         if "GROUP BY StageName" in soql:
