@@ -90,7 +90,7 @@ def fetch_salesforce(period: Period, client: SalesforceClient | None = None) -> 
     )
     won = sf.query(
         "SELECT Id, Name, CloseDate, Recurring_Revenue__c, One_Time_Revenue__c, Lease_Change_Type__c, "
-        "Opportunity_Client_Type__c, LeadSource, Property__r.Name FROM Opportunity "
+        "Opportunity_Client_Type__c, Property__r.Name FROM Opportunity "
         f"WHERE IsWon = true AND CloseDate >= {window_first.isoformat()} AND CloseDate <= {window_last.isoformat()}"
     )
     # Tours run through today so the priorities section can list today's tours.
@@ -134,7 +134,6 @@ def fetch_salesforce(period: Period, client: SalesforceClient | None = None) -> 
                 "one_time_revenue": r.get("One_Time_Revenue__c") or 0.0,
                 "lease_change_type": r.get("Lease_Change_Type__c"),
                 "client_type": r.get("Opportunity_Client_Type__c"),
-                "lead_source": r.get("LeadSource"),
                 "property": _rel_name(r, "Property__r"),
             }
             for r in won

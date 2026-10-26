@@ -15,7 +15,7 @@ def lead(day, status="New", source="Google Ads", lead_type="Physical Tenant", pr
 
 def won(day, rr, change="New Client", one_time=0.0, name="Deal"):
     return {"close_date": day, "name": name, "recurring_revenue": rr, "one_time_revenue": one_time,
-            "lease_change_type": change, "client_type": "Virtual Client", "lead_source": None,
+            "lease_change_type": change, "client_type": "Virtual Client",
             "property": "P08 - The Torrance"}
 
 
@@ -94,7 +94,7 @@ class FakeSalesforce:
         if "FROM Opportunity WHERE IsWon" in soql:
             return [{"CloseDate": "2026-10-15", "Name": "X", "Recurring_Revenue__c": None, "One_Time_Revenue__c": 35,
                      "Lease_Change_Type__c": "New Client", "Opportunity_Client_Type__c": "One Time User",
-                     "LeadSource": "LiquidSpace", "Property__r": {"Name": "P98 - Corporate Point Calabasas"}}]
+                     "Property__r": {"Name": "P98 - Corporate Point Calabasas"}}]
         if "FROM Event" in soql:
             return [{"ActivityDate": "2026-10-15", "Subject": "Tour"}]
         if "GROUP BY StageName" in soql:
@@ -210,6 +210,29 @@ class SettingsTests(unittest.TestCase):
                 mock.patch.dict(sources.FETCHERS, {"ga4": sources.fetch_ga4}, clear=True):
             raw = sources.fetch_all(build_period(date(2026, 10, 16)))
         self.assertIn("GA4_PROPERTY_ID is not set", raw["errors"]["ga4"])
+
+
+class MailerTests(unittest.TestCase):
+    def test_resend_api_used_when_key_set(self):
+        from unittest import mock
+        from daily_report import mailer
+        env = {"RESEND_API_KEY": "re_test", "REPORT_FROM": "Brief <onboarding@resend.dev>"}
+        with mock.patch.dict("os.environ", env), \
+                mock.patch.object(mailer.requests, "post", return_value=mock.Mock(ok=True)) as post, \
+                mock.patch.object(mailer.smtplib, "SMTP") as smtp:
+            mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
+        smtp.assert_not_called()
+        self.assertEqual(post.call_args.kwargs["json"]["to"], ["a@example.com"])
+        self.assertEqual(post.call_args.kwargs["headers"]["Authorization"], "Bearer re_test")
+
+    def test_resend_error_is_raised(self):
+        from unittest import mock
+        from daily_report import mailer
+        bad = mock.Mock(ok=False, status_code=403, text="domain not verified")
+        with mock.patch.dict("os.environ", {"RESEND_API_KEY": "re_test", "REPORT_FROM": "x@y.com"}), \
+                mock.patch.object(mailer.requests, "post", return_value=bad):
+            with self.assertRaisesRegex(RuntimeError, "domain not verified"):
+                mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
 
 
 class ScheduleGuardTests(unittest.TestCase):
