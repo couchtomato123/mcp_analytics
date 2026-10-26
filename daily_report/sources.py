@@ -184,12 +184,12 @@ def _ga4_rows(response) -> list:
 
 
 def fetch_ga4(period: Period) -> dict:
+    property_id = require_env("GA4_PROPERTY_ID").removeprefix("properties/")
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
     from google.analytics.data_v1beta.types import (
         DateRange, Dimension, Metric, OrderBy, RunReportRequest,
     )
 
-    property_id = require_env("GA4_PROPERTY_ID").removeprefix("properties/")
     client = BetaAnalyticsDataClient(credentials=_ga4_credentials())
     window = DateRange(start_date=period.window_start.isoformat(), end_date=period.end.isoformat())
     in_period = DateRange(start_date=period.start.isoformat(), end_date=period.end.isoformat())
