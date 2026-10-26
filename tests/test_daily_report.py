@@ -211,15 +211,6 @@ class SettingsTests(unittest.TestCase):
             raw = sources.fetch_all(build_period(date(2026, 10, 16)))
         self.assertIn("GA4_PROPERTY_ID is not set", raw["errors"]["ga4"])
 
-    def test_salesforce_domain_without_scheme_gets_https(self):
-        from unittest import mock
-        from daily_report import sources
-        resp = mock.Mock(ok=True, json=lambda: {"instance_url": "https://x.my.salesforce.com", "access_token": "t"})
-        env = {"SF_DOMAIN_URL": "x.my.salesforce.com/", "SF_CLIENT_ID": "id", "SF_CLIENT_SECRET": "secret"}
-        with mock.patch.dict("os.environ", env), mock.patch.object(sources.requests, "post", return_value=resp) as post:
-            sources.SalesforceClient()
-        self.assertEqual(post.call_args.args[0], "https://x.my.salesforce.com/services/oauth2/token")
-
 
 class ScheduleGuardTests(unittest.TestCase):
     def test_skips_the_utc_run_that_is_not_7am_pacific(self):

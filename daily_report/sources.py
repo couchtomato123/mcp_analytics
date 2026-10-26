@@ -41,8 +41,6 @@ class SalesforceClient:
 
     def __init__(self):
         domain = require_env("SF_DOMAIN_URL").rstrip("/")  # e.g. https://barrister.my.salesforce.com
-        if not domain.startswith(("https://", "http://")):
-            domain = f"https://{domain}"
         resp = requests.post(
             f"{domain}/services/oauth2/token",
             data={
