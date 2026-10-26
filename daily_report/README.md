@@ -48,8 +48,17 @@ and so on. If a run gets stuck for 5 minutes (`REPORT_TIMEOUT_SECONDS`), it prin
 was stuck and exits as failed.
 
 **Railway blocks outbound SMTP (ports 25/465/587) on its Free, Trial and Hobby plans**;
-only Pro can send mail directly. On those plans the log stops at `Connecting to ...` and
-the run times out. Either upgrade to Pro, or send through an HTTPS email API instead.
+only Pro can send mail directly. On those plans the log stops at `Connecting to ...`.
+Either upgrade to Pro, or set `RESEND_API_KEY`, which sends over HTTPS instead:
+
+1. Sign up at resend.com and create an API key with sending access.
+2. Set `RESEND_API_KEY=re_...`. When it's set, the `SMTP_*` variables are ignored.
+3. Set `REPORT_FROM`:
+   - **No DNS changes:** `Barrister Brief <onboarding@resend.dev>`. Resend only allows this
+     test sender to email the address you signed up with, so sign up with the report's
+     Gmail address.
+   - **Any recipient:** verify `barrister-suites.com` in Resend (one DKIM record plus an
+     SPF/MX pair on a `send.` subdomain), then use e.g. `reports@barrister-suites.com`.
 
 `deploy/daily_report.sh` is an alternative setup on Google Cloud (Cloud Run Job + Cloud Scheduler).
 

@@ -212,6 +212,29 @@ class SettingsTests(unittest.TestCase):
         self.assertIn("GA4_PROPERTY_ID is not set", raw["errors"]["ga4"])
 
 
+class MailerTests(unittest.TestCase):
+    def test_resend_api_used_when_key_set(self):
+        from unittest import mock
+        from daily_report import mailer
+        env = {"RESEND_API_KEY": "re_test", "REPORT_FROM": "Brief <onboarding@resend.dev>"}
+        with mock.patch.dict("os.environ", env), \
+                mock.patch.object(mailer.requests, "post", return_value=mock.Mock(ok=True)) as post, \
+                mock.patch.object(mailer.smtplib, "SMTP") as smtp:
+            mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
+        smtp.assert_not_called()
+        self.assertEqual(post.call_args.kwargs["json"]["to"], ["a@example.com"])
+        self.assertEqual(post.call_args.kwargs["headers"]["Authorization"], "Bearer re_test")
+
+    def test_resend_error_is_raised(self):
+        from unittest import mock
+        from daily_report import mailer
+        bad = mock.Mock(ok=False, status_code=403, text="domain not verified")
+        with mock.patch.dict("os.environ", {"RESEND_API_KEY": "re_test", "REPORT_FROM": "x@y.com"}), \
+                mock.patch.object(mailer.requests, "post", return_value=bad):
+            with self.assertRaisesRegex(RuntimeError, "domain not verified"):
+                mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
+
+
 class ScheduleGuardTests(unittest.TestCase):
     def test_skips_the_utc_run_that_is_not_7am_pacific(self):
         from unittest import mock
