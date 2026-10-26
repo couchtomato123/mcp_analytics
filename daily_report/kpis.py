@@ -58,7 +58,7 @@ def daily_kpis(raw: dict, day: date) -> dict:
         out.update(
             new_leads=len(leads),
             qualified_leads=sum(1 for l in leads if l["status"] == "Qualified"),
-            tours=sum(1 for t in sf["tours"] if t["date"] == d),
+            tours=None if sf["tours"] is None else sum(1 for t in sf["tours"] if t["date"] == d),
             signed_deals=len(won),
             new_business_deals=sum(1 for o in won if o["lease_change_type"] in NEW_BUSINESS_TYPES),
             new_mrr=sum(o["recurring_revenue"] for o in won),
@@ -245,6 +245,9 @@ def _what_happened(report: dict) -> list:
     for source, ok in report["available"].items():
         if not ok:
             bullets.append(f"{SOURCE_NAMES[source]} data was unavailable for this run, so its sections are blank.")
+    if "salesforce_tours" in report["errors"]:
+        bullets.append("Tour counts were unavailable because Salesforce wouldn't return Events; "
+                       "all other Salesforce figures are complete.")
 
     deals = report["deals"]
     if deals is not None:
@@ -298,7 +301,7 @@ def _priorities(report: dict, raw: dict, period: Period, leads: list) -> list:
     sf = raw.get("salesforce")
     if sf is not None:
         today = period.run_date.isoformat()
-        tours_today = sum(1 for t in sf["tours"] if t["date"] == today)
+        tours_today = sum(1 for t in sf["tours"] or [] if t["date"] == today)
         if tours_today:
             bullets.append(f"{tours_today} tour{'s' if tours_today != 1 else ''} on the calendar today. Confirm attendance.")
         untouched = sum(1 for l in leads if l["status"] == "New")

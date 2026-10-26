@@ -89,7 +89,7 @@ def main(argv=None) -> int:
         "row_counts": {
             "sf_leads": len(sf.get("leads", [])),
             "sf_won_opps": len(sf.get("won_opps", [])),
-            "sf_tours": len(sf.get("tours", [])),
+            "sf_tours": len(sf.get("tours") or []),
             "ga4_daily": len((raw.get("ga4") or {}).get("daily", [])),
             "google_ads_daily": len((raw.get("google_ads") or {}).get("daily", [])),
         },

@@ -90,7 +90,7 @@ def _glance(r):
     tiles = [
         _tile("New leads", _num(t["new_leads"]), sub("new_leads")),
         _tile("Qualified leads", _num(t["qualified_leads"]), sub("qualified_leads")),
-        _tile("Tours", _num(t["tours"]), sub("tours")),
+        _tile("Tours", _num(t["tours"]), sub("tours") if t["tours"] is not None else UNAVAILABLE),
         _tile("Signed deals", _num(t["signed_deals"]),
               f"<b>{_num(t['new_business_deals'])} new business</b> · {mix}"),
         _tile("New monthly revenue", _num(t["new_mrr"], True),
@@ -112,7 +112,7 @@ def _comparison(r):
     sources = {key: source for key, _, source, _ in KPI_DEFS}
     rows = []
     for row in r["comparison"]:
-        if not r["available"][sources[row["key"]]]:
+        if not r["available"][sources[row["key"]]] or row["actual"] is None:
             rows.append([escape(row["label"]), UNAVAILABLE, "", ""])
             continue
         rows.append([escape(row["label"]), _num(row["actual"], row["currency"]),

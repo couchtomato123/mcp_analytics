@@ -94,10 +94,16 @@ def fetch_salesforce(period: Period, client: SalesforceClient | None = None) -> 
         f"WHERE IsWon = true AND CloseDate >= {window_first.isoformat()} AND CloseDate <= {window_last.isoformat()}"
     )
     # Tours run through today so the priorities section can list today's tours.
-    tours = sf.query(
-        "SELECT Id, ActivityDate, Subject FROM Event WHERE Subject LIKE '%Tour%' "
-        f"AND ActivityDate >= {window_first.isoformat()} AND ActivityDate <= {period.run_date.isoformat()}"
-    )
+    # Queried separately from the rest: the free "Salesforce Integration" user
+    # license can't read Events, and that shouldn't blank out leads and deals.
+    tours_error = None
+    try:
+        tours = sf.query(
+            "SELECT Id, ActivityDate, Subject FROM Event WHERE Subject LIKE '%Tour%' "
+            f"AND ActivityDate >= {window_first.isoformat()} AND ActivityDate <= {period.run_date.isoformat()}"
+        )
+    except RuntimeError as exc:
+        tours, tours_error = None, str(exc)
     pipeline = sf.query(
         "SELECT StageName, COUNT(Id) cnt, SUM(Recurring_Revenue__c) rr FROM Opportunity "
         "WHERE IsClosed = false GROUP BY StageName"
@@ -139,7 +145,8 @@ def fetch_salesforce(period: Period, client: SalesforceClient | None = None) -> 
             }
             for r in won
         ],
-        "tours": [{"date": r["ActivityDate"], "subject": r.get("Subject")} for r in tours],
+        "tours": None if tours is None else [{"date": r["ActivityDate"], "subject": r.get("Subject")} for r in tours],
+        "tours_error": tours_error,
         "pipeline": [
             {"stage": r["StageName"], "count": r["cnt"], "recurring_revenue": r.get("rr") or 0.0}
             for r in pipeline
@@ -284,6 +291,9 @@ def fetch_all(period: Period) -> dict:
         try:
             raw[name] = fetch(period)
             log.info("Fetched %s in %.1fs", name, time.monotonic() - started)
+            if raw[name].get("tours_error"):
+                log.warning("Salesforce tours unavailable: %s", raw[name]["tours_error"])
+                raw["errors"]["salesforce_tours"] = raw[name]["tours_error"]
         except MissingSetting as exc:
             log.error("Fetching %s failed: %s", name, exc)
             raw["errors"][name] = str(exc)
