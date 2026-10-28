@@ -18,7 +18,7 @@ JOB="${JOB:-barrister-daily-report}"
 SA_NAME="${SA_NAME:-daily-report}"
 SA="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 SCHEDULE="${SCHEDULE:-0 7 * * 1-5}"
-RECIPIENTS="${REPORT_RECIPIENTS:-leasing@barrister-suites.com}"
+RECIPIENTS="${REPORT_RECIPIENTS:?set REPORT_RECIPIENTS, comma-separated}"
 
 # Non-secret settings. Fill in before the first deploy.
 ENV_VARS="REPORT_RECIPIENTS=${RECIPIENTS}"

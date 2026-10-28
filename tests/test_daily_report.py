@@ -117,6 +117,38 @@ class SalesforceTransformTests(unittest.TestCase):
         self.assertIn("ActivityDate <= 2026-10-16", fake.queries[2])  # tours through today
 
 
+class NoEventAccessSalesforce(FakeSalesforce):
+    """The 'Salesforce Integration' license can't read Events."""
+
+    def query(self, soql):
+        if "FROM Event" in soql:
+            raise RuntimeError("SOQL failed (400): sObject type 'Event' is not supported.")
+        return super().query(soql)
+
+
+class ToursUnavailableTests(unittest.TestCase):
+    def test_event_failure_only_blanks_tours(self):
+        from unittest import mock
+        from daily_report import sources
+        period = build_period(date(2026, 10, 16))
+        with mock.patch.dict(sources.FETCHERS,
+                             {"salesforce": lambda p: sources.fetch_salesforce(p, NoEventAccessSalesforce())},
+                             clear=True):
+            raw = sources.fetch_all(period)
+        self.assertIn("Event' is not supported", raw["errors"]["salesforce_tours"])
+        self.assertNotIn("salesforce", raw["errors"])
+        self.assertIsNone(raw["salesforce"]["tours"])
+        self.assertEqual(len(raw["salesforce"]["leads"]), 1)
+
+        r = build_report(raw, period)
+        self.assertIsNone(r["totals"]["tours"])
+        self.assertEqual(r["totals"]["new_leads"], 1)  # leads still counted
+        self.assertTrue(any("Tour counts were unavailable" in b for b in r["happened"]))
+        html = render_html(r)
+        self.assertIn("Tours</td><td", html)
+        self.assertIn(UNAVAILABLE, html)
+
+
 class ReportTests(unittest.TestCase):
     def setUp(self):
         self.period = build_period(date(2026, 10, 16))
@@ -233,6 +265,17 @@ class MailerTests(unittest.TestCase):
                 mock.patch.object(mailer.requests, "post", return_value=bad):
             with self.assertRaisesRegex(RuntimeError, "domain not verified"):
                 mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
+
+
+class RecipientTests(unittest.TestCase):
+    def test_missing_recipients_fails_before_fetching(self):
+        from unittest import mock
+        from daily_report import __main__ as cli
+        env = {k: v for k, v in __import__("os").environ.items() if k not in ("REPORT_RECIPIENTS", "REPORT_SEND_HOUR")}
+        with mock.patch.dict("os.environ", env, clear=True), \
+                mock.patch.object(cli, "fetch_all") as fetch:
+            self.assertEqual(cli.main([]), 1)
+            fetch.assert_not_called()
 
 
 class ScheduleGuardTests(unittest.TestCase):
