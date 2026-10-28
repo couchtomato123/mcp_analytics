@@ -267,6 +267,17 @@ class MailerTests(unittest.TestCase):
                 mailer.send_email("Subj", "<p>hi</p>", "hi", ["a@example.com"])
 
 
+class RecipientTests(unittest.TestCase):
+    def test_missing_recipients_fails_before_fetching(self):
+        from unittest import mock
+        from daily_report import __main__ as cli
+        env = {k: v for k, v in __import__("os").environ.items() if k not in ("REPORT_RECIPIENTS", "REPORT_SEND_HOUR")}
+        with mock.patch.dict("os.environ", env, clear=True), \
+                mock.patch.object(cli, "fetch_all") as fetch:
+            self.assertEqual(cli.main([]), 1)
+            fetch.assert_not_called()
+
+
 class ScheduleGuardTests(unittest.TestCase):
     def test_skips_the_utc_run_that_is_not_7am_pacific(self):
         from unittest import mock

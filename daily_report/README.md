@@ -1,8 +1,8 @@
 # Barrister Daily Marketing + Sales Brief
 
 Every weekday at 7:00 AM Pacific this job pulls Salesforce, GA4 and Google Ads
-data, computes the funnel KPIs from the build spec, and emails the brief to
-`leasing@barrister-suites.com`.
+data, computes the funnel KPIs from the build spec, and emails the brief to the
+addresses in `REPORT_RECIPIENTS`.
 
 - **Tue–Fri** cover the previous day.
 - **Monday** covers Fri + Sat + Sun as one total, with a by-day breakdown.
@@ -74,7 +74,7 @@ file on your own machine, which `.gitignore` keeps out of git.
 | `GA4_PROPERTY_ID` | GA4 property ID. Auth reuses `GOOGLE_ADS_REFRESH_TOKEN` (same as `main.py`), or the job's service account if no refresh token is set; add that service account as a Viewer on the property |
 | `GOOGLE_ADS_CUSTOMER_ID`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_REFRESH_TOKEN` (optional: `GOOGLE_ADS_DEVELOPER_TOKEN`, and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` for a manager/MCC account) | Same values the MCP server already uses. Only set the optional ones if the MCP service has them |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `REPORT_FROM` | Outlook / Microsoft 365: `smtp.office365.com`, `587`, the sending mailbox's full address and password; `REPORT_FROM` must be that same address. The mailbox needs **Authenticated SMTP** enabled (Microsoft 365 admin center → Users → the user → Mail → Manage email apps). Microsoft plans to turn basic-auth SMTP off by default at the end of December 2026 (admins can re-enable it); if that bites, switch to Resend (`smtp.resend.com`, user `resend`, API key) or Brevo (`smtp-relay.brevo.com`). No code change either way |
-| `REPORT_RECIPIENTS` | Comma-separated. Defaults to `leasing@barrister-suites.com` |
+| `REPORT_RECIPIENTS` | Required. Comma-separated, e.g. `leasingbarristersuites@gmail.com,someone@barrister-suites.com` |
 
 The Salesforce *SObject Read* connector in Claude is tied to an interactive
 user session, so it can't drive an unattended job. It was used to verify every

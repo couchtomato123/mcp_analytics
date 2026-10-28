@@ -15,9 +15,6 @@ from .periods import build_period, local_hour, today_local
 from .render import render_html, render_text, subject
 from .sources import fetch_all
 
-DEFAULT_RECIPIENTS = "leasing@barrister-suites.com"
-
-
 def main(argv=None) -> int:
     load_dotenv()
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
@@ -26,8 +23,8 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Barrister Daily Marketing + Sales Brief")
     parser.add_argument("--date", type=date.fromisoformat,
                         help="Report on this single day (YYYY-MM-DD) instead of the scheduled period")
-    parser.add_argument("--to", default=os.getenv("REPORT_RECIPIENTS", DEFAULT_RECIPIENTS),
-                        help="Comma-separated recipients (default: REPORT_RECIPIENTS or %(default)s)")
+    parser.add_argument("--to", default=os.getenv("REPORT_RECIPIENTS", ""),
+                        help="Comma-separated recipients (default: the REPORT_RECIPIENTS variable)")
     parser.add_argument("--dry-run", action="store_true", help="Write the email to --html-out instead of sending it")
     parser.add_argument("--html-out", default="daily_report.html", help="Where --dry-run writes the HTML")
     parser.add_argument("--raw-out", help="Save the fetched source data as JSON (for audits)")
@@ -49,6 +46,12 @@ def main(argv=None) -> int:
         faulthandler.cancel_dump_traceback_later()
         return 0
 
+    recipients = [r.strip() for r in args.to.split(",") if r.strip()]
+    if not recipients and not args.dry_run:
+        logging.error("REPORT_RECIPIENTS is not set. Add it to this service's variables in Railway.")
+        faulthandler.cancel_dump_traceback_later()
+        return 1
+
     period = build_period(args.run_date or today_local(), args.date)
     logging.info("Building report for %s", ", ".join(d.isoformat() for d in period.days))
     if args.raw_in:
@@ -62,7 +65,6 @@ def main(argv=None) -> int:
 
     report = build_report(raw, period)
     html, text, subj = render_html(report), render_text(report), subject(report)
-    recipients = [r.strip() for r in args.to.split(",") if r.strip()]
 
     sent, send_error = False, None
     if args.dry_run:
