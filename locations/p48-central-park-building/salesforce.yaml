@@ -1,0 +1,17 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P48 - Central Park Building
+address: 3500 W. Olive Ave., Suite 300, Burbank, CA 91505
+city: Burbank
+parking_available: true
+amenities:
+- No City Gross Receipts Tax
+- In the heart of the Media District, Adjacent to Warner Bros., NBC, and Disney Studio Lots
+- Easy access to Ventura (134), Hollywood (101), & Golden State (5) Freeways
+- Convenient parking
+- Claim Jumper Restaurant
+- City National Bank Branch & ATM
+- On-Site Car wash / auto detailing
+- 3.3 Miles to Burbank Airport
+- Convenient public transportation access
+- Inquire about Coworking and Shared office space opportunities.

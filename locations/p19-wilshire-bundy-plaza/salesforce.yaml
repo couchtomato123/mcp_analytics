@@ -1,0 +1,16 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P19 - Wilshire Bundy Plaza
+address: 12121 Wilshire Blvd., Suite 810, Los Angeles, CA 90025
+city: Los Angeles
+parking_available: true
+amenities:
+- On-site cafe, salon, parking, outdoor seating area. 24/7 security. many shops, restaurants, theaters, hotels,
+  gyms, etc nearby.
+- When you walk into your new reception area, you will be greeted by a professionally trained receptionist as well
+  as a striking view of the Santa Monica Mountains, Hollywood Hills & Getty Center. The beautifully appointed conference
+  rooms and co-working space are perfect to impress your clients or hold inter-company meetings. The window offices
+  feature floor to ceiling windows to give you natural light and stunning views. This office is in close proximity
+  to a wide variety of restaurants in the Brentwood and Westwood area.The Virtual Office Programs provide all the
+  benefits of a physical office at a fraction of the cost. This centre offers use of beautifully appointed conference
+  rooms or private office usage for rental by the day or by the hour.

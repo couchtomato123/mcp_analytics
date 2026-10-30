@@ -1,0 +1,14 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P78 - Century Park Plaza
+address: 1801 Century Park East, 24th & 25th Floors, Los Angeles, CA 90067
+city: Los Angeles
+parking_available: true
+amenities:
+- Convenient Access to Santa Monica (10) and San Diego (405) Freeways
+- 11 miles to Los Angeles International Airport
+- 2 Banks
+- Theaters & Health Clubs
+- Pedestrian Walkway to Westfield Century City Mall and Restaurants
+- Valet Parking
+- Inquire about Coworking

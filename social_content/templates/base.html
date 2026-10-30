@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Social Studio{% endblock %} · Barrister</title>
+<style>
+  :root { --ink:#1d2430; --muted:#5f6b7a; --line:#dde2e8; --bg:#f6f7f9; --card:#fff; --accent:#1f4e79;
+          --ok:#1e7b46; --warn:#9a6200; --bad:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--accent); color:#fff; padding:12px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  header a { color:#fff; text-decoration:none; font-weight:600; }
+  header .spacer { flex:1; }
+  header form { margin:0; }
+  header button { background:none; border:1px solid #ffffff80; color:#fff; padding:4px 10px; border-radius:6px; cursor:pointer; }
+  main { max-width:960px; margin:0 auto; padding:16px; }
+  h1 { font-size:22px; margin:8px 0 16px; } h2 { font-size:17px; margin:24px 0 8px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:99px; font-size:12px; font-weight:600; background:#e8edf3; }
+  .s-draft { background:#fff1d6; color:var(--warn); } .s-approved { background:#e3f1ff; color:var(--accent); }
+  .s-scheduled, .s-published { background:#dff3e7; color:var(--ok); } .s-rejected, .s-failed { background:#fde3e1; color:var(--bad); }
+  a.row { display:flex; gap:12px; text-decoration:none; color:inherit; align-items:flex-start; }
+  a.row img, .thumb { width:72px; height:72px; object-fit:cover; border-radius:8px; background:#e8edf3; flex:none; }
+  .row .body { min-width:0; } .row .text { white-space:pre-wrap; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+  textarea, input[type=text], input[type=email], input[type=datetime-local] { width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  textarea { min-height:220px; }
+  button, .btn { font:inherit; padding:9px 14px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer; color:var(--ink); text-decoration:none; display:inline-block; }
+  button.primary { background:var(--ok); border-color:var(--ok); color:#fff; } button.danger { color:var(--bad); }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+  .grid label { display:block; cursor:pointer; } .grid img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:3px solid transparent; }
+  .grid input:checked + img { border-color:var(--ok); } .grid input { display:none; }
+  .notice { background:#fff8e6; border:1px solid #f1d9a2; border-radius:8px; padding:10px 12px; margin-bottom:12px; }
+  .flash { background:#e3f1ff; border-radius:8px; padding:8px 12px; margin-bottom:12px; }
+  .over { color:var(--bad); font-weight:600; }
+  ul.checks { margin:6px 0 0; padding-left:18px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="/">Barrister Social Studio</a>
+  <span class="spacer"></span>
+  {% if email %}<span class="muted" style="color:#dfe8f1">{{ email }}</span>
+  <form method="post" action="/logout"><button>Sign out</button></form>{% endif %}
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

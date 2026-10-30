@@ -1,0 +1,14 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P35 - Warner Corporate Center
+address: 21300 Victory Blvd., 3rd Floor, Woodland Hills, CA 91367
+city: Woodland Hills
+parking_available: true
+amenities:
+- Convenient Access to Ventura (101) and San Diego (405) Freeways
+- Floor-to-Ceiling Windows with Panoramic Views of the Mountains and San Fernando Valley
+- Walking Distance to The Village, Promenade & Westfield Topanga Shopping Centers
+- 16 miles to Burbank Airport
+- Nearby banks, restaurants, hotels & entertainment
+- Convenient, Covered Parking Onsite & Free Parking Across the Street
+- Newly Remodeled Building with Lush Landscaping & Water Features

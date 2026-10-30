@@ -1,0 +1,14 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P83 - Olympic Plaza
+address: 11500 Olympic Blvd., Suite 400, Los Angeles, CA 90064
+city: Los Angeles
+parking_available: true
+amenities:
+- Convenient Access to San Diego (405) and Santa Monica (10) Freeways
+- Beautiful Courtyard and sweeping view offices
+- 24/7 Access
+- Car Wash and Auto Detailing on site
+- Two blocks from Sawtelle restaurant row
+- iL Moro Italian Restaurant located next door
+- Inquire about Coworking and Shared office space opportunities.

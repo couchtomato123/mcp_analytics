@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:40px auto">
+  <h1>Sign in</h1>
+  {% if expired %}<div class="notice">That link has expired or isn't valid. Ask for a new one.</div>{% endif %}
+  {% if sent %}
+    <p>If that address reviews a location, a sign-in link is on its way. Check your inbox.</p>
+  {% else %}
+    <form method="post" action="/login?next={{ next|urlencode }}">
+      <label>Work email<br><input type="email" name="email" required autofocus></label>
+      <div class="actions"><button class="primary">Email me a sign-in link</button></div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

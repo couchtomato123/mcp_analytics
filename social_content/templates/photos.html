@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Photos · {{ loc.name }}{% endblock %}
+{% block content %}
+<a href="/l/{{ loc.slug }}" class="muted">← {{ loc.name }}</a>
+<h1>Photo library</h1>
+{% if msg %}<div class="flash">{{ msg|capitalize }}.</div>{% endif %}
+<form method="post" enctype="multipart/form-data" class="card">
+  <p><b>Add photos</b> <span class="muted">Bright, real shots of offices, the lobby, views, meeting rooms, the neighborhood. Phone photos are fine.</span></p>
+  <input type="file" name="files" accept="image/*" multiple required>
+  <p><label>What do they show? <span class="muted">(optional, helps Claude write about them)</span>
+    <input type="text" name="caption" placeholder="e.g. Corner office on the 9th floor, view toward the Galleria"></label></p>
+  <div class="actions"><button class="primary">Upload</button></div>
+</form>
+<div class="grid">
+  {% for ph in photos %}
+  <div class="card" style="padding:8px">
+    <img src="/media/{{ ph.id }}.jpg" alt="{{ ph.caption or '' }}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px">
+    <div class="muted">{{ ph.caption or ph.filename }}</div>
+    {% if ph.source == "upload" %}
+    <form method="post"><input type="hidden" name="photo_id" value="{{ ph.id }}"><button class="danger" name="action" value="archive" style="padding:4px 8px;margin-top:4px">Remove</button></form>
+    {% endif %}
+  </div>
+  {% else %}<p>No photos yet. Instagram posts need one, and every post does better with one.</p>{% endfor %}
+</div>
+{% endblock %}

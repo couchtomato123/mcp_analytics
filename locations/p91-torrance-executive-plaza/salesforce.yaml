@@ -1,0 +1,17 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P91 - Torrance Executive Plaza
+address: 3868 Carson Street, 3rd Floor, Torrance, CA 90503
+city: Torrance
+parking_available: true
+amenities:
+- Convenient Access to Harbor (110) and San Diego (405) Freeways
+- 11miles to Los Angeles International Airport
+- Del Amo Mall
+- Torrance Court House
+- Banks
+- Theaters & Health Clubs
+- Restaurants and Hotels
+- Free Covered Parking
+- Free Tenant & Client Parking
+- Inquire about Coworking and Shared office space opportunities.

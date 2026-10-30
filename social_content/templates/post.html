@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ platform.label }} post{% endblock %}
+{% block content %}
+<a href="/l/{{ loc.slug }}" class="muted">← {{ loc.name }}</a>
+<h1>{{ platform.label }} · {{ post.scheduled_at|local }} <span class="pill s-{{ post.status }}">{{ post.status }}</span></h1>
+{% if msg %}<div class="flash">{{ msg|capitalize }}.</div>{% endif %}
+{% if post.publish_error %}<div class="notice"><b>Publishing failed:</b> {{ post.publish_error }}</div>{% endif %}
+{% set checks = blocking + (post.needs_check or []) %}
+{% if checks and post.status not in ("scheduled", "published") %}<div class="notice"><b>Please check before approving:</b>
+  <ul class="checks">{% for c in checks %}<li>{{ c }}</li>{% endfor %}</ul></div>{% endif %}
+<p class="muted">Theme: {{ post.pillar }}</p>
+{% set editable = post.status not in ("scheduled", "published") %}
+<form method="post" class="card">
+  <label><b>Post text</b> <span class="muted" id="count"></span>
+    <textarea name="text" id="text" {% if not editable %}readonly{% endif %}>{{ post.text }}</textarea></label>
+  <p class="muted">Make it yours: add a local detail, your name, today's vibe at the front desk.</p>
+
+  <b>Photo</b>{% if platform.needs_photo %} <span class="muted">(required)</span>{% endif %}
+  <div class="grid" style="margin:8px 0">
+    {% if not platform.needs_photo %}<label><input type="radio" name="photo_id" value="" {% if not post.photo_id %}checked{% endif %} {% if not editable %}disabled{% endif %}><div class="thumb" style="width:100%;height:auto;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px" >No photo</div></label>{% endif %}
+    {% for ph in photos %}
+    <label title="{{ ph.caption or ph.filename }}"><input type="radio" name="photo_id" value="{{ ph.id }}" {% if ph.id == post.photo_id %}checked{% endif %} {% if not editable %}disabled{% endif %}><img src="/media/{{ ph.id }}.jpg" alt="{{ ph.caption or '' }}" loading="lazy"></label>
+    {% endfor %}
+  </div>
+  <a href="/l/{{ loc.slug }}/photos" class="muted">Upload more photos</a>
+  <p><label><b>Photo description</b> <span class="muted">(alt text for screen readers)</span>
+    <input type="text" name="alt_text" value="{{ post.alt_text or '' }}" {% if not editable %}readonly{% endif %}></label></p>
+  <p><label><b>Post on</b> <span class="muted">(Pacific time)</span>
+    <input type="datetime-local" name="scheduled_at" value="{{ post.scheduled_at|local('%Y-%m-%dT%H:%M') }}" {% if not editable %}readonly{% endif %}></label></p>
+
+  {% if editable %}
+  <div class="actions">
+    <button class="primary" name="action" value="approve">{% if auto %}Approve &amp; schedule{% else %}Approve{% endif %}</button>
+    <button name="action" value="save">Save changes</button>
+    {% if post.status != "rejected" %}<button class="danger" name="action" value="reject">Reject</button>{% endif %}
+  </div>
+  <h2>Ask Claude to rewrite</h2>
+  <input type="text" name="instruction" placeholder="e.g. shorter, mention the free parking, more playful">
+  <div class="actions"><button name="action" value="rewrite">Rewrite</button></div>
+  {% endif %}
+  {% if post.status == "approved" and not auto %}
+  <div class="actions"><button class="primary" name="action" value="mark_posted">Mark as posted</button></div>
+  <p class="muted">Copy the text above and download the photo (open it, then save) to post it yourself.</p>
+  {% endif %}
+  {% if post.status == "rejected" %}<div class="actions"><button name="action" value="reopen">Reopen as draft</button></div>{% endif %}
+</form>
+{% if post.text != post.draft_text %}
+<details class="card"><summary>Claude's original draft</summary><p style="white-space:pre-wrap">{{ post.draft_text }}</p></details>
+{% endif %}
+<script>
+  const t = document.getElementById('text'), c = document.getElementById('count'), max = {{ platform.max_chars }};
+  const upd = () => { c.textContent = `${t.value.length} / ${max}`; c.className = t.value.length > max ? 'over' : 'muted'; };
+  t.addEventListener('input', upd); upd();
+</script>
+{% endblock %}

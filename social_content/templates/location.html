@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ loc.name }}{% endblock %}
+{% block content %}
+{% if many %}<a href="/" class="muted">← All locations</a>{% endif %}
+<h1>{{ loc.name }}</h1>
+<div class="actions" style="margin-top:-6px;margin-bottom:12px"><a class="btn" href="/l/{{ loc.slug }}/photos">Photo library</a></div>
+{% if not auto %}<div class="notice">Approved posts aren't published automatically for this location yet. After approving, copy the text and photo to the account, then click <b>Mark as posted</b>.</div>{% endif %}
+{% for week, posts in weeks %}
+  <h2>Week of {{ week.strftime("%b %d") }}</h2>
+  {% for p in posts %}
+  <a class="card row" href="/p/{{ p.id }}">
+    {% if p.photo_id %}<img src="/media/{{ p.photo_id }}.jpg" alt="" loading="lazy">{% else %}<div class="thumb"></div>{% endif %}
+    <div class="body">
+      <div><span class="pill s-{{ p.status }}">{{ p.status }}</span>
+        <b>{{ PLATFORMS[p.platform].label }}</b> <span class="muted">{{ p.scheduled_at|local }}</span>
+        {% if p.id in overdue %}<span class="over"> overdue</span>{% endif %}
+        {% if p.needs_check and p.status == "draft" %}<span class="muted"> · {{ p.needs_check|length }} to check</span>{% endif %}</div>
+      <div class="text">{{ p.text }}</div>
+    </div>
+  </a>
+  {% endfor %}
+{% else %}
+  <p>No drafts yet. They arrive each week; you'll get an email when they do.</p>
+{% endfor %}
+{% endblock %}

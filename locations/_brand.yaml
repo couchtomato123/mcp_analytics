@@ -1,0 +1,22 @@
+# Company-wide notes Claude reads for every location. Keep it factual.
+company: Barrister Executive Suites
+website: ""              # main site, e.g. https://... (used when a location has no booking_link)
+what_we_offer:
+  - Private executive offices, furnished or unfurnished
+  - Virtual office programs (business address, mail handling, call answering)
+  - Coworking and shared office space
+  - Conference rooms and day offices by the hour or by the day
+  - Conference room use at 20+ Barrister locations across Southern California
+  - Professional receptionists and on-site management
+audience: >-
+  Attorneys, accountants, consultants, entertainment and media professionals,
+  small firms, startups and remote teams who want a professional address
+  without a long traditional lease.
+voice: >-
+  Professional but warm and local. Concrete details over adjectives. No hype
+  words like "unparalleled" or "game-changer". Speak to the reader as "you".
+never:
+  - Quote prices, discounts or availability unless they appear in the location's profile
+  - Name tenants or clients
+  - Make claims about other companies or competitors
+  - Use the word "cheap"

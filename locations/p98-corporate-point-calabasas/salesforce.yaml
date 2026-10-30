@@ -1,0 +1,12 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P98 - Corporate Point Calabasas
+address: 27001 Agoura Road, Suite 350, Calabasas, CA 91301
+city: Calabasas
+parking_available: true
+amenities:
+- Free Unreserved Parking & Paid Reserved Parking Available
+- Banks, Restaurants, Hotels, Shops, Fitness Centers, & Theaters Nearby
+- 17 Miles to Van Nuys Airport
+- No Business License Required, No Gross Receipts Tax, No City Business Tax Levy
+- Inquire about Coworking and Shared office

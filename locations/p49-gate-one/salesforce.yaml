@@ -1,0 +1,15 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P49 - Gate One
+address: 2625 Townsgate Road, Suite 330, Westlake Village, CA 91361
+city: Westlake Village
+parking_available: true
+amenities:
+- High profile corporate facility
+- Completely remodeled Building
+- Westlake Plaza nearby
+- Near Hyatt Westlake Plaza Hotel
+- Excellent access to Ventura (101) Freeway
+- 32 miles to Burbank Airport
+- Free Tenant & Client Parking
+- Inquire about Coworking and Shared office space opportunities.

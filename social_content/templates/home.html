@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Locations</h1>
+{% for loc, waiting in rows %}
+<a class="card row" href="/l/{{ loc.slug }}">
+  <div class="body"><b>{{ loc.name }}</b>
+    <div class="muted">{% if not loc.active %}Paused · {% endif %}{{ waiting }} awaiting review</div></div>
+</a>
+{% else %}<p>No locations are assigned to {{ email }}.</p>{% endfor %}
+{% endblock %}

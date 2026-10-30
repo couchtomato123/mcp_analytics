@@ -1,0 +1,29 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P95 - Berkeley Business Center
+address: 1738 Berkeley Street, Santa Monica, CA 90404
+city: Santa Monica
+parking_available: true
+amenities:
+- On-Site Management w/ Professional Receptionist
+- Furnished or Unfurnished Offices
+- Personalized Call Answering/Screening
+- Conference Room Use w/ Online Reservation System & Access to All Barrister Locations
+- Mail/Package Handling & Postage
+- Telephone Service & Equipment
+- Enterprise-Grade High Speed Internet & WiFi
+- Employee Lounge/Break Room
+- Networked Color Copier/Scanner & Facsimile
+- Directory Listing in Building Lobby
+- Janitorial Services & Utilities
+- 24/7 Access & Building Surveillance
+nearby:
+- Convenient Access to the San Diego (405) & Santa Monica (10) Freeways
+- Walking Distance to the Expo/Bundy Metro Station
+- Free/Metered Street Parking & Reserved Covered/Uncovered Parking Available
+- Newly Remodeled Open Concept Space
+- Architecturally Iconic Interior & Exterior Designs
+- State-of-the-Art Conference Room Facilities
+- Outdoor Patio with Views of the Santa Monica Mountains & LA Skyline
+- Banks, Restaurants, Gyms, Theaters, Boutiques & Hotels Nearby
+- 9 Miles to LA International Airport & 2 Miles to Santa Monica Airport

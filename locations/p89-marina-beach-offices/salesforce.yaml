@@ -1,0 +1,19 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P89 - Marina Beach Offices
+address: 475 Washington Blvd., Marina Del Rey, CA 90292
+city: Marina Del Rey
+parking_available: true
+amenities:
+- Unique Building Offers an Innovative and Ideal Work Environment
+- Outdoor Atrium Seating Area
+- Convenient Access to Marina (90) Freeway
+- Walking Distance to Marina Del Rey Marina and Venice Beach
+- Near Abbot Kinney Blvd. Shops and Restaurants
+- 5 miles to Los Angeles International Airport
+- Banks
+- Theaters
+- Health Clubs
+- Restaurants and Hotels
+- Free Street Parking
+- Inquire about Coworking and Shared office space opportunities.

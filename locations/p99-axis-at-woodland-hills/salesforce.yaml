@@ -1,0 +1,13 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P99 - AXIS at Woodland Hills
+address: '21031 Ventura Blvd #200, Woodland Hills, CA 91364'
+city: Woodland Hills
+parking_available: true
+amenities:
+- Class A Building with Floor-to-Ceiling Windows
+- Conveniently Accessible & Visible to Ventura (101) Freeway
+- 8 miles to Van Nuys Airport & 15 Miles to Burbank Airport
+- Newly Remodeled Building Interior & Exterior Common Areas
+- Outdoor Courtyard Patio Seating
+- Onsite EV Charging Stations & Abundant Metered Street Parking Available

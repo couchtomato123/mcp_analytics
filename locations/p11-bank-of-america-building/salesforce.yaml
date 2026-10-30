@@ -1,0 +1,14 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P11 - Bank of America Building
+address: 9440 Santa Monica Blvd., Beverly Hills, CA 90210
+city: Beverly Hills
+parking_available: true
+amenities:
+- Gorgeous Class A Building w/ Floor to Ceiling Windows
+- Large Private Terrace Overlooking Los Angeles
+- Car Wash/Auto Detailing, Banking & Free Client & Visitor Valet Parking On-Site
+- Convenient Access to Santa Monica (10) & San Diego (405) Freeways
+- 14 Miles to Los Angeles International Airport
+- Located w/in the Highly Sought After “Golden Triangle”
+- Banks, Theaters, Health Clubs, Worldclass Shopping, Hotels & Restaurants Nearby

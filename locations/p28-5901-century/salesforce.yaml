@@ -1,0 +1,9 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P28 - 5901 Century
+address: 5901 Century Boulevard, Suite 750, Los Angeles, CA 90045
+city: Los Angeles
+parking_available: true
+amenities:
+- Beautiful LAX location with stunning Airport views. Newly renovated w/ Executive Clubhouse, Dog Park, Bicycle
+  Sharing Program, Gym & Cafe w/ outdoor seating on-site.

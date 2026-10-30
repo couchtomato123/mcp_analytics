@@ -1,0 +1,16 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P44 - Comerica Bank Building
+address: 15303 Ventura Blvd., 9th Floor, Sherman Oaks, CA 91403
+city: Sherman Oaks
+parking_available: true
+amenities:
+- Convenient Access to Hollywood (101)
+- San Diego (405) and Ventura (134) Freeways
+- 11.4 miles to Burbank Airport
+- Banks
+- Theaters & Health Clubs
+- Restaurants & Hotels
+- Sherman Oaks Galleria and Concierge On-Site
+- Metered street parking available
+- Inquire about Coworking and Shared office space opportunities.

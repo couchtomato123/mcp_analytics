@@ -1,0 +1,14 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P42 - City National Bank Building
+address: 16133 Ventura Blvd., 7th Floor, Encino, CA 91436
+city: Encino
+parking_available: true
+amenities:
+- Convenient Access to Ventura (101) and San Diego(405) Freeways
+- 11.5 miles to Burbank Airport
+- Theatres & Health Clubs
+- Restaurants & Hotels
+- Adjacent to Sherman Oaks Galleria, Encino Shopping and Boulevard Shopping
+- Metered street parking available
+- Inquire about Coworking and Shared office space opportunities.

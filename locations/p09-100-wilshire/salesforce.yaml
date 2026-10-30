@@ -1,0 +1,6 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P09 - 100 Wilshire
+address: 100 Wilshire Blvd., Suite 700, Santa Monica, CA 90401
+city: Santa Monica
+parking_available: true

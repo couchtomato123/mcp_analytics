@@ -1,0 +1,13 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P66 - Torrey Reserve
+address: 11622 El Camino Real, Suite 100, San Diego, CA 92130
+city: San Diego
+parking_available: false
+amenities:
+- Prestigious Torrey Reserve development in Torrey Highlands (Del Mar)
+- Convenient Access to 5, 56 and 805 Freeways
+- 30 Minutes to Downtown San Diego and San Diego Airport
+- Minutes to Del Mar Race Tracks and World famous Torrey Pines Golf Course
+- Hotels nearby and restaurants on building campus
+- Inquire about Coworking and Shared office space opportunities.

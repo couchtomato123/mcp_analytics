@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py .
 COPY daily_report ./daily_report
+COPY social_content ./social_content
+COPY locations ./locations
 
 EXPOSE 8080
 

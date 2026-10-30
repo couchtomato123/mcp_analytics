@@ -1,0 +1,11 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P27 - MBS Media Campus
+address: 1600 Rosecrans Ave., Bldg 7, 4th Floor, Manhattan Beach, CA 90266
+city: Manhattan Beach
+parking_available: true
+amenities:
+- Receptionist services, conference room use onsite & at 20+ Barrister locations, mail/package handling, beverage
+  services, lounge with full kitchen, state-of-the-art photocopier, on-campus salon, café, carwash/auto detailing,
+  spa, New York Street, EV charging stations, masseuse, concierge, dog walker, dry cleaner, production services,
+  24/7 gated and manned security, dog and bicycle friendly

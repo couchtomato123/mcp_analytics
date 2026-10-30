@@ -1,0 +1,17 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P67 - The Timbers
+address: 445 Marine View Ave., Suite 300, Del Mar, CA 92014
+city: Del Mar
+parking_available: true
+amenities:
+- Pacific Ocean views
+- Free parking
+- Convenient I-5 Freeway Access
+- Newly renovated building
+- Desirable atrium style design
+- Expansive window line allowing maximum natural light and creative office atmosphere
+- Card Key access with 24 hour surveillance
+- Nearby attractions include the Lomas Santa Fe Plaza, Flower Hill Promenade, Del Mar Fairgrounds and Race Track
+  and the Lomas Santa Fe Country Club
+- Close proximity to Solana Beach Coaster Station and North County Transit Stations

@@ -1,0 +1,16 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P45 - Summit at Valencia
+address: 27240 Turnberry Lane, Suite 200, Valencia, CA 91355
+city: Valencia
+parking_available: true
+amenities:
+- Located in the Prestigious Valencia Gateway
+- Convenient Access to I-5 Freeway and Highway 126
+- 10 minutes North of the San Fernando Valley
+- 30 miles North of Downtown Los Angeles
+- Nearby Championship Golf Courses
+- Close to Newhall Ranch & Valencia Town Center
+- Near Six Flags Magic Mountain & Valencia Country Club
+- Free tenant & client parking
+- Inquire about Coworking and Shared office space opportunities.

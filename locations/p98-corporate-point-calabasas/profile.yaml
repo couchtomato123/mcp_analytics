@@ -1,0 +1,24 @@
+# Corporate Point Calabasas: edit freely. Facts from Salesforce live in salesforce.yaml next to this file.
+code: P98
+name: Corporate Point Calabasas
+active: false            # true = draft posts for this location every week
+
+# People at this location who edit and approve posts (they sign in with this email).
+reviewers: []
+
+# Posts per week on each platform. Remove a line to skip that platform.
+platforms:
+  facebook: 2
+  instagram: 2
+  linkedin: 1
+  google_business: 1
+
+# How this location sounds. A sentence or two from the reviewer helps a lot,
+# e.g. "Warm and neighborly; we know every tenant by name. Lots of film/TV people."
+voice: ""
+
+# Facts Claude may use that aren't in Salesforce: current offers, events,
+# what makes this floor special, the reviewer's name to sign posts with.
+extra_facts: []
+
+booking_link: ""         # tour or day-office booking URL for this location

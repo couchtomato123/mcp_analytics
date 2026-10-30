@@ -4,3 +4,4 @@ secret.json
 .venv/
 __pycache__/
 *.pyc
+social_content.db

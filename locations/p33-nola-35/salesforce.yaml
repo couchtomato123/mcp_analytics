@@ -1,0 +1,13 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P33 - Nola 35
+address: 35 North Lake Avenue, Suite 710, Pasadena, CA 91101
+city: Pasadena
+parking_available: true
+amenities:
+- Located in Lake Avenue’s Business & Shopping District
+- Close Proximity to Historic Old Town Pasadena, the Rose Bowl & the Pasadena Tournament of Roses Parade
+- FREE Fitness Center use for Full-Time Tenants
+- Convenient Access to the 210, 134 & 110 Freeways
+- Walking Distance to Highly Acclaimed Restaurants, Shops, Museums & the new Paseo Colorado
+- Panoramic Views of the San Gabriel Valley, Mt Wilson, & Mt Baldy

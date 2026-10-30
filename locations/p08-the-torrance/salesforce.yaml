@@ -1,0 +1,6 @@
+# Copied from Salesforce Property__c by `python -m social_content seed-from-salesforce`.
+# Edits here are overwritten; fix the facts in Salesforce or add to profile.yaml.
+salesforce_name: P08 - The Torrance
+address: 21250 Hawthorne Blvd. Suite 500, Torrance, CA 90503
+city: Torrance
+parking_available: true
